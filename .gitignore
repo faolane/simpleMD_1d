@@ -1,0 +1,10 @@
+# ignore results fies
+*.res
+# ignore test directory
+test/
+# ignore modules files
+*.mod
+# ignore executable files
+*.exe
+# ignore compilation files for now
+compil
