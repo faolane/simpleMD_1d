@@ -1,4 +1,3 @@
-!* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !**********************************************************************
 !********        FILE: randgen.f                         **************
 !********        AUTHORS: Richard Chandler               **************
@@ -8,7 +7,10 @@
 !********        LAST MODIFIED: 26/8/03                  **************
 !********        See file randgen.txt for details        **************
 !**********************************************************************
-
+!* These subroutines have been extracted from the randgen.f file
+!* obtained at http://www.ucl.ac.uk/~ucakarc/work/randgen.html
+!* and translated from fixed form f77 to free form f90 language
+!**********************************************************************
       BLOCK DATA ZBQLBD01
 !*
 !*       Initializes seed array etc. for random number generator.

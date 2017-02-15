@@ -7,7 +7,8 @@
 ! *************************************************
 ! all units are atomic units
 ! *************************************************
-! F. Brieuc - January 2017
+! Copyright (C) 2017 Fabien Brieuc under the terms
+! of the GNU General Public License.
 ! *************************************************
 
 module param

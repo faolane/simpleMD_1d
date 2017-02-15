@@ -3,7 +3,8 @@
 ! *************************************************
 ! Contains subroutine and functions to compute forces
 ! *************************************************
-! F. Brieuc - January 2017
+! Copyright (C) 2017 Fabien Brieuc under the terms
+! of the GNU General Public License.
 ! *************************************************
 
 module force

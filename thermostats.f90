@@ -4,7 +4,8 @@
 ! Contains subroutines and functions for the
 ! different thermostats
 ! *************************************************
-! F. Brieuc - January 2017
+! Copyright (C) 2017 Fabien Brieuc under the terms
+! of the GNU General Public License.
 ! *************************************************
 
 module thermostats

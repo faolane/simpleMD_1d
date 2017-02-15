@@ -4,9 +4,10 @@
 ! simple MD code for 1 dof systems
 ! 1 particle in various type of external potentials
 ! *************************************************
-! F. Brieuc - January 2017
-! *************************************************
 ! All units are atomic units
+! *************************************************
+! Copyright (C) 2017 Fabien Brieuc under the terms
+! of the GNU General Public License.
 ! *************************************************
 
 ! contains parameters, constants definition & conversion functions
