@@ -8,3 +8,7 @@ test/
 *.exe
 # ignore compilation files for now
 compil
+# ignore gnuplot files
+*.pl
+# ignore script files
+*.sh

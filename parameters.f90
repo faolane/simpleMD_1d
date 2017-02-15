@@ -35,6 +35,8 @@ module param
    ! O and fmax and thus the random fore applies for more than one timestep.
    ! 3 : Random forces are generated using the method of Barrat
    ! potential
+   integer  :: nQTB = 100   ! nb of points/grid used for the PSD in freq. space
+         ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)
    character(len = 15) :: pot = 'harmonic' ! type of external potential
    real(dp) :: f0 = 10.d0                  ! characteristic frequency of
                                            ! harmonic potential in THz (10 THz)
@@ -48,7 +50,9 @@ module param
    real(dp) :: v0 = 0.d0     ! initial velocity (bohr)
    real(dp) :: m = 1.d0      ! mass of the particle (atomic units)
    !other
-   integer  :: mQTB = 1      ! new rand forces every mQTB steps
+   integer  :: mQTB = 1      ! rand force generation/update every mQTB steps
+   real(dp), dimension(:), allocatable   :: HQTB ! contains the "filter"(Barrat)
+   real(dp), dimension(:,:), allocatable :: rQTB ! contains random nb (Barrat)
    real(dp) :: std = 0.d0    ! std deviation of Random force (Lang or QTB)
    real(dp) :: R = 0.d0      ! stores random force (Langevin or QTB)
    real(dp) :: omegamax = 1.d0 ! cut-off ang. freq. for QTB random forces
@@ -73,7 +77,7 @@ module param
    integer :: enerFileUnit = 13
    integer :: randfFileUnit = 14
 
-   namelist / thermostat / therm, gam, T, fmax, noiseGenMode
+   namelist / thermostat / therm, gam, T, fmax, noiseGenMode, nQTB
    namelist / potential / pot, f0
    namelist / calculation / nstep, neq, nw, nrep, dt, x0, v0, m
 

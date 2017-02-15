@@ -14,7 +14,7 @@ module force
 
 contains
 
-   real(dp) function totalForce(x, xm, xp, v, n)
+   real(dp) function totalForce(x, xm, xp, v, irep, n)
       ! compute the total force that applies on each replica
       implicit none
 
@@ -23,12 +23,13 @@ contains
       real(dp), intent(in) :: xp ! position of replica i+1
       real(dp), intent(in) :: v  ! velocity
       integer, intent(in)  :: n  ! nstep number
+      integer, intent(in)  :: irep ! replica nb
 
       if (nrep > 1) then
-         totalForce = potentialForce(x) + thermostatForce(v, n) &
+         totalForce = potentialForce(x) + thermostatForce(v, irep, n) &
                      &+ replicasForce(x,xm,xp)
       else
-         totalForce = potentialForce(x) + thermostatForce(v, n)
+         totalForce = potentialForce(x) + thermostatForce(v, irep, n)
       endif
 
    end function totalForce
@@ -49,7 +50,7 @@ contains
 
    end function potentialForce
 
-   real(dp) function thermostatForce(v, n)
+   real(dp) function thermostatForce(v, irep, n)
       ! compute forces associated with the thermostat
       use param
       use thermostats
@@ -57,6 +58,7 @@ contains
 
       real(dp), intent(in) :: v ! velocity
       integer, intent(in)  :: n ! step number
+      integer, intent(in)  :: irep ! replica nb
 
       select case (therm)
          case('nve')
@@ -65,7 +67,7 @@ contains
             thermostatForce = langevin(v)
          case ('bussi')
          case('qtb')
-            thermostatForce = qtb(v, n)
+            thermostatForce = qtb(v, irep, n)
       end select
 
    end function thermostatForce

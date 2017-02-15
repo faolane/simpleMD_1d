@@ -6,7 +6,7 @@
 &calculation
 nstep = 100000000
 nw = 500000
-dt = 0.2
+dt = 0.25
 m = 1836.15
 /
 
@@ -35,20 +35,23 @@ f0 = 50.0
 
 &thermostat
 therm = 'qtb'
-gam = 5.0
+gam = 0.5
 fmax = 100.0
-noiseGenMode = 2
+noiseGenMode = 3
+nQTB = 200
 T = 50.0
 /
 
 ! thermostat parameters
 ! parameter name (default value) : description
 !--------------------------------------------
-! therm ('nve') : type of thermostats ('nve', 'langevin', 'qtb', 'bussi')
-! gam (1.0)     : friction coefficient (for langevin and qtb) in THz
+! therm ('nve')    : type of thermostats ('nve', 'langevin', 'qtb', 'bussi')
+! gam (1.0)        : friction coefficient (for langevin and qtb) in THz
 ! fmax (1e7)       : cut-off freq. for random forces generation (for QTB thermostat) in THz
 ! noiseGenMode (1) : type of random force generation (for QTB themostat)
 ! ( 1 : standard method of Dammak et al, 2 : modified method of Dammak et al
 !   3 : method of Barrat and Rodney )
-! T (300.0)     : target temperature in K
+! nQTB : nb of points (ie. grid) use for the discretization of the PSD (ie. filter)
+! or generation of QTB force using the method of Barrat (noiseGenMode = 3)
+! T (300.0)        : target temperature in K
 

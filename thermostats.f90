@@ -7,8 +7,6 @@
 ! F. Brieuc - January 2017
 ! *************************************************
 
-!include 'ZBQ.f90'
-
 module thermostats
    use param
    implicit none
@@ -46,12 +44,30 @@ contains
                   std = dsqrt(2.D0 * gam * M / (mQTb * dt))
                   call generQTBRandF2('qtbRandF.tmp')
                   open(randfFileUnit, file ='qtbRandF.tmp', form='unformatted')
+               ! Random force generation : Barrat and Rodney
+               else if (noiseGenMode == 3) then
+                  ! new random force at every mQTB = 1/(2*fmax*dt) steps
+                  mQTB = nint(1.d0 / (2.d0 * fmax * dt))
+                  if (mQTB == 0) mQTB = 1
+                  print*, 'mQTB =', mQTB
+                  std = dsqrt(2.D0 * gam * M / (mQTb * dt))
+                  ! ensure that nQTB is even
+                  if (mod(nQTB,2) /= 0) nQTB = nQTB + 1
+                  allocate(HQTB(0:nQTB-1)) !"filter" (PSD) in the time domain
+                  allocate(rQTB(nrep,0:nQTB-1)) !random numbers
+                  call generQTBRandF3()
+
                endif
          end select
       else if (mode == 'terminate') then
          select case(therm)
             case('qtb')
-               close(randfFileUnit)
+               if (noiseGenMode == 1 .or. noiseGenMode == 2) then
+                  close(randfFileUnit)
+               else if (noiseGenMode == 3) then
+                  deallocate(HQTB)
+                  deallocate(rQTB)
+               endif
                call system('rm -f qtbRandF.tmp')
          end select
       endif
@@ -75,23 +91,33 @@ contains
 
    end function langevin
 
-   real(dp) function qtb(v, n)
+   real(dp) function qtb(v, irep, n)
       ! compute forces associated with the QTB thermostat (ie. quantum
       ! Langevin thermostat)
-      ! *******************************************
-      ! the random forces have to be generated using the method of Dammak et al.
-      ! described in the appendix of Brieuc et al., JCTC, 12, 5688–5697 (2016)
       use param
       implicit none
 
       real(dp), intent(in) :: v ! velocity
       integer, intent(in)  :: n ! step number
+      integer, intent(in)  :: irep ! replica nb
+      integer :: i
       real :: R_sngl
 
       !new QTB random force every mQTB step
       if (mod(n, mQTB) == 0) then
-         read(randfFileUnit) R_sngl
-         R = R_sngl
+         if (noiseGenMode == 1 .or. noiseGenMode == 2) then
+            read(randfFileUnit) R_sngl
+            R = R_sngl
+         else if (noiseGenMode == 3) then
+            ! compute random force trough the convolution product
+            R = 0.d0
+            do i = 0, nQTB-2
+               R = R + HQTB(i) * rQTB(irep, i)
+               rQTB(irep, i) = rQTB(irep, i + 1)
+            enddo
+            R = R + HQTB (nQTB - 1) * rQTB(irep, nQTB - 1)
+            rQTB(irep, nQTB - 1) = gaussianRand(1.d0,0.d0)
+         endif
       endif
 
       qtb = R - m * gam * v
@@ -123,11 +149,11 @@ contains
       ! so that:
       ! <R(t)> = 0
       ! <R(t)R(t+tau) = FT(2 * m * gamma * kappa(w,T)) (Wiener-Khinchin)
-      ! **********************************************
       ! see Brieuc, Dammak and Hayoun, JCTC, 12, 1351-1359 (2016)
       ! **********************************************
-      ! the random force is generated here using the method of Dammak
-      ! described in the appendix of Brieuc et al., JCTC, 12, 5688–5697 (2016)
+      ! the random force is generated here using the method proposed by Dammak
+      ! and coworkers and described in details in the appendix of
+      ! Brieuc et al., JCTC, 12, 5688–5697 (2016)
       use param
       implicit none
 
@@ -217,13 +243,12 @@ contains
       ! so that:
       ! <R(t)> = 0
       ! <R(t)R(t+tau) = FT(2 * m * gamma * kappa(w,T)) (Wiener-Khinchin)
-      ! **********************************************
       ! see Brieuc, Dammak and Hayoun, JCTC, 12, 1351-1359 (2016)
       ! **********************************************
-      ! the random force is generated here using the method of Dammak
-      ! with a small modification : the random force is only generated
-      ! for freq. < fmax and thus with a time step h = 1/(2*fmax). So random
-      ! forces are not updated every timestep anymore but every
+      ! the random force is generated here using the method proposed by Dammak
+      ! and coworkers with a small modification : the random force is only
+      ! generated for freq. < fmax and thus with a time step h = 1/(2*fmax).
+      ! So random forces are not updated every timestep anymore but every
       ! mQTB = h / dt timesteps. The same rand. force applies for h timesteps.
       ! To account for this modification the target PSD as to be corrected.
       ! see Barrat and Rodney, J. Stat. Phys., 144, 679–689 (2011)
@@ -295,6 +320,101 @@ contains
       deallocate(fP)
 
    end subroutine generQTBRandF2
+
+   subroutine generQTBRandF3()
+      ! generates forces associated with the QTB thermostat (ie. quantum
+      ! Langevin thermostat)
+      ! *********************************************
+      ! if nrep = 1 : standard QTB thermostat
+      ! *********************************************
+      ! The random force is a gaussian colored noise with
+      ! a Power Spectral Density (PSD) given by:
+      ! 2 * m * gamma * theta(w, T) and
+      ! theta(w, T) = 0.5 * hbar * w * ( 1 + 1 / (exp( hbar * w / kT ) - 1 ) )
+      ! so that:
+      ! <R(t)> = 0
+      ! <R(t)R(t+tau) = FT(2 * m * gamma * theta(w,T)) (Wiener-Khinchin theorem)
+      ! see Dammak et al, PRL, 103, 190601 (2009) for more details
+      ! **********************************************
+      ! if nrep > 1 : QTB-PIMD thermostat
+      ! **********************************************
+      ! The random force is also a stationnary gaussian colored noise but with
+      ! a modified Power Spectral Density (PSD) given by:
+      ! 2 * m * gamma * kappa(w, T) and
+      ! kappa(w, T) = P * kT * f_P(hw/2kT) and f_P solution of
+      ! eq. (13) for f_P^(0) and solution of eq. (16) for f_P^(1)
+      ! so that:
+      ! <R(t)> = 0
+      ! <R(t)R(t+tau) = FT(2 * m * gamma * kappa(w,T)) (Wiener-Khinchin)
+      ! see Brieuc, Dammak and Hayoun, JCTC, 12, 1351-1359 (2016)
+      ! **********************************************
+      ! the random force is generated "on-the-fly" using the method proposed by
+      ! Barrat and Rodney. The random force is generated for freq. < fmax
+      ! and thus with a time step h = 1/(2*fmax). So random forces are not
+      ! updated every timestep but every mQTB = h / dt timesteps.
+      ! The same rand. force applies for h timesteps. To account for this
+      ! modification the target PSD as to be corrected. This subroutine
+      ! initialize the values of the filter and of the first random numbers.
+      ! The forces are then generated at every mQTB steps by computing
+      ! the convolution product.
+      ! see Barrat and Rodney, J. Stat. Phys., 144, 679–689 (2011)
+      use param
+      implicit none
+
+      integer  :: idof, iw, nmax
+      real(dp) :: w, dw !angular freq. and angular freq. step
+      real(dp) :: correct, h ! correction of the spectrum to take into account
+                             ! the time step h = mQTB * dt
+      real(dp) :: tmp
+      complex(dp), dimension(:), allocatable :: Hw, Ht
+      real(dp), dimension(:), allocatable :: fP
+
+      ! ensure that nmax is even
+      ! if (mod(nQTB,2) /= 0) nQTB = nQTB + 1
+
+      ! number of points
+      nmax = nQTB
+
+      ! angular freg. step
+      dw = 2.d0 * omegamax / nmax
+
+      ! h = ranom force R(t) time step : h = mQTB * dt
+      h = mQTB * dt
+
+      allocate(fP(int(nmax / 2 - 1)))
+      allocate(Hw(0:nmax - 1))
+      allocate(Ht(0:nmax - 1))
+
+      ! compute f_P function
+      call computefP(fP, dw)
+      fP = dfloat(nrep) * KB * T * fP !fP is now in au energy units (Ha)
+
+      ! compute the "filter" H(w)
+      do iw = 1, int(nmax / 2 - 1)
+         w = iw * dw
+         tmp = 0.5d0 * w * h
+         correct = dsin(tmp) / tmp
+         Hw(iw) = dsqrt(fP(iw)) / correct * (1.d0, 0.d0)
+      enddo
+      ! to ensure that H(t) is real
+      do iw = int(nmax / 2 + 1), nmax - 1
+         Hw(iw) = dconjg(Hw(nmax - iw))
+      enddo
+      Hw(0)  = (0.0d0, 0.0d0)
+      Hw(nmax / 2)  = (0.0d0, 0.0d0)
+      !FFT of H(w) -> H(t)
+      call FFT(Hw, Ht)
+      do iw = 0, nmax - 1
+         HQTB(iw) = realpart(Ht(iw)) * std / dfloat(nmax)
+         do idof = 1, nrep
+            rQTB(idof, iw) = gaussianRand(1.d0,0.d0)
+         enddo
+      enddo
+
+      deallocate(Hw)
+      deallocate(Ht)
+
+   end subroutine generQTBRandF3
 
    subroutine computefP(fP, dw)
       use param

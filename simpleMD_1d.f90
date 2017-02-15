@@ -69,7 +69,7 @@ program simpleMD_1d
    call computeInstEner(x(:,2), v)
    xc = 0.d0
    do irep = 1, nrep
-      F = totalForce(x(irep,2), x(im(irep),2), x(ip(irep),2), v(irep), istep)
+      F = totalForce(x(irep,2), x(im(irep),2), x(ip(irep),2), v(irep), irep, istep)
       x(irep,1) = x(irep,2) + dt * v(irep) + (0.5d0 * dt**2 / m) * F
       xc = xc + x(irep, 1) * ONREP
       v(irep) = (x(irep,1) - x(irep,2)) / dt
@@ -81,7 +81,7 @@ program simpleMD_1d
       xc = 0.d0
       do irep = 1 ,nrep
          ! forces
-         F = totalForce(x(irep,1), x(im(irep),1), x(ip(irep),1), v(irep), istep)
+         F = totalForce(x(irep,1), x(im(irep),1), x(ip(irep),1), v(irep), irep, istep)
          ! Verlet - position - t+dt
          xx(irep) = 2.d0 * x(irep,1) - x(irep,2) + DT2OM * F
          ! centroid position
@@ -107,7 +107,7 @@ program simpleMD_1d
       xc = 0.d0
       do irep = 1 ,nrep
          ! Force
-         F = totalForce(x(irep,1), x(im(irep),1), x(ip(irep),1), v(irep), istep)
+         F = totalForce(x(irep,1), x(im(irep),1), x(ip(irep),1), v(irep), irep, istep)
          ! Verlet - position - t+dt
          xx(irep) = 2.d0 * x(irep,1) - x(irep,2) + DT2OM * F
          ! centroid position
