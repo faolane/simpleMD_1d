@@ -418,6 +418,7 @@ contains
    end subroutine generQTBRandF3
 
    subroutine computefP(fP, dw)
+      ! compute the values for the f_P
       use param
       implicit none
 
@@ -435,6 +436,10 @@ contains
             tmp = HBokT * w
             ! fP = theta(w, T) / kT
             fP(iw) = tmp * (0.5d0 + 1.d0 / (exp(tmp) - 1.d0))
+         enddo
+      else if (nrep > 1) then
+         do iw = 1, n
+
          enddo
       endif
    end subroutine computefP

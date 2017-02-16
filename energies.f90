@@ -116,11 +116,14 @@ contains
          case('harmonic')
             Epot = 0.5d0 * m * omega0**2 * x**2 * ONREP
          case('quartic')
+            Epot = 0.0d0
          case ('morse')
+            Epot = 0.0d0
          case('double-well')
+            Epot = 0.0d0
+         case default
+            Epot = 0.0d0
       end select
-
-
    end function Epot
 
 end module energy

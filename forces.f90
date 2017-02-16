@@ -45,8 +45,13 @@ contains
          case('harmonic')
             potentialForce = - m * omega0**2 * x * ONREP
          case('quartic')
+            potentialForce = 0.d0
          case ('morse')
+            potentialForce = 0.d0
          case('double-well')
+            potentialForce = 0.d0
+         case default
+            potentialForce = 0.d0
       end select
 
    end function potentialForce
@@ -67,8 +72,11 @@ contains
          case('langevin')
             thermostatForce = langevin(v)
          case ('bussi')
+            thermostatForce = 0.0d0
          case('qtb')
             thermostatForce = qtb(v, irep, n)
+         case default
+            thermostatForce = 0.d0
       end select
 
    end function thermostatForce
