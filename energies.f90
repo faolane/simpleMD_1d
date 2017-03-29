@@ -114,13 +114,13 @@ contains
 
       select case (pot)
          case('harmonic')
-            Epot = 0.5d0 * m * omega0**2 * x**2 * ONREP
+            Epot = 0.5d0 * MW02 * x**2 * ONREP
          case('quartic')
-            Epot = 0.0d0
+            Epot = A * x**4 * ONREP
          case ('morse')
-            Epot = 0.0d0
+            Epot = D * (dexp(-alpha * x) - 1.d0)**2 * ONREP
          case('double-well')
-            Epot = 0.0d0
+            Epot = V0 * ((x / x0)**2 - 1.d0)**2 * ONREP
          case default
             Epot = 0.0d0
       end select

@@ -55,9 +55,9 @@ program simpleMD_1d
    ! initialization of positions and velocities
    xc = 0.d0
    do irep = 1, nrep
-      x(irep, 2) = x0
+      x(irep, 2) = xini
       xc = xc + x(irep, 2) * ONREP
-      v(irep) = v0
+      v(irep) = vini
    enddo
 
    ! initialization of the random generator seed

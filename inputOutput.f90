@@ -27,6 +27,8 @@ contains
       dt = fs2au(dt)
       read(10, potential)
       omega0 = TWOPI * THz2au(f0)
+      D = eV2Ha(D)
+      V0 = eV2Ha(V0)
       read(10, thermostat)
       gam = THz2au(gam)
       fmax = THz2au(fmax)
@@ -43,6 +45,9 @@ contains
       ! some usefull quantities
       KBTO2 = 0.5d0 * KB * T
       ONREP = 1.d0 / dfloat(nrep)
+      MW02 = m * omega0**2
+      TDALP = 2.d0 * D * alpha
+      FV0oX02 = 4.d0 * V0 / x0**2
 
    end subroutine readInputFile
 
@@ -58,7 +63,7 @@ contains
          case('b')
             call idate(date); call itime(time)
             write(6, *) '###### simpleMD 1D ######'
-            write(6, '(a25,i2.2,a1,i2.2,a1,i4,a4,i2.2,a,i2.2,a,i2.2)'), &
+            write(6, '(a25,i2.2,a1,i2.2,a1,i4,a4,i2.2,a,i2.2,a,i2.2)') &
                      &' calculation launched on ', &
                      & date(1), '\',  date(2), '\', date(3), &
                      &' at ', time(1), ':', time(2), ':', time(3)

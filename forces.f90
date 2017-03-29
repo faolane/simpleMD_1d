@@ -43,13 +43,14 @@ contains
 
       select case (pot)
          case('harmonic')
-            potentialForce = - m * omega0**2 * x * ONREP
+            potentialForce = - MW02 * x * ONREP
          case('quartic')
-            potentialForce = 0.d0
+            potentialForce = 4.d0 * A * x**3 * ONREP
          case ('morse')
-            potentialForce = 0.d0
+            potentialForce = TDALP * dexp(-alpha * x) * &
+                             &(dexp(-alpha * x) - 1.d0) * ONREP
          case('double-well')
-            potentialForce = 0.d0
+            potentialForce = FV0oX02 * x * ((x / x0)**2 - 1.d0) * ONREP
          case default
             potentialForce = 0.d0
       end select

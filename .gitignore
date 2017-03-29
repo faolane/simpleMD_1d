@@ -2,6 +2,8 @@
 *.res
 # ignore test directory
 test/
+#ignore documentation directory
+doc/
 # ignore modules files
 *.mod
 # ignore executable files
@@ -14,3 +16,7 @@ compil
 *.sh
 # ignore object files
 *.o
+#ignore ploting script
+*.pl
+#ignore temporary / test files
+fort.*

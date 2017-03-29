@@ -1,7 +1,8 @@
 # simple makefile for simpleMD_1d program
 # Copyright (C) Fabien Brieuc - 2017
 FC = gfortran
-FFLAGS = -O3 -fconvert='big-endian' -Wall
+#FFLAGS = -O3 -fconvert='big-endian' -Wall
+FFLAGS = -O3 -fconvert='big-endian' -Wall -fbounds-check
 FLIBS = -L/usr/local/lib -lfftw3
 EXE = simpleMD_1d.exe
 #OBJ = simpleMD_1d.o parameters.o thermostats.o inputOutput.o forces.o /

@@ -12,6 +12,12 @@ nuclear quantum effects.
 The code is still in beta for now, most 
 features have not been fully tested yet!
 
+Quick starting guide:
+- type 'make' to compil the program
+- edit the 'input.dat' file to your need 
+  (see the documentation)
+- run the program using ./simpleMD_1d.exe
+
 Copyright (C) 2017 Fabien Brieuc
 This software is distributed under the terms
 of the GNU General Public License.

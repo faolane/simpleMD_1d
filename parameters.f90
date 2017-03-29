@@ -38,17 +38,25 @@ module param
    ! potential
    integer  :: nQTB = 100   ! nb of points/grid used for the PSD in freq. space
          ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)
+   integer  :: piqtbMode = 0               ! QTB-PIMD mode (0)
    character(len = 15) :: pot = 'harmonic' ! type of external potential
    real(dp) :: f0 = 10.d0                  ! characteristic frequency of
                                            ! harmonic potential in THz (10 THz)
+   real(dp) :: A = 1.d0                    ! for quartic potential V(x)=A*x^4
+   real(dp) :: V0 = 1.d0                   ! barrier height of the double-well
+                                           ! potential in eV
+   real(dp) :: x0 = 1.d0                   ! position of the two wells (in bohr)
+   real(dp) :: D = 1.d0                    ! Dissociation energy of the Morse
+                                           ! potential (in eV)
+   real(dp) :: alpha = 1.d0                ! width of the Morse pot. (1/bohr)
    ! calculation
    integer  :: nstep = 1     ! total number of MD steps (for average values)
    integer  :: neq = 1       ! number of equilibrium steps
    integer  :: nw = 1        ! writing frequency (in outputs files)
    integer  :: nrep = 1      ! number of replicas (Trotter number) for PIMD
    real(dp) :: dt = 1.d0     ! timestep (fs)
-   real(dp) :: x0 = 0.d0     ! initial position (bohr)
-   real(dp) :: v0 = 0.d0     ! initial velocity (bohr)
+   real(dp) :: xini = 0.d0   ! initial position (bohr)
+   real(dp) :: vini = 0.d0   ! initial velocity (bohr)
    real(dp) :: m = 1.d0      ! mass of the particle (atomic units)
    !other
    integer  :: mQTB = 1      ! rand force generation/update every mQTB steps
@@ -60,6 +68,9 @@ module param
    real(dp) :: omega0 = 1.d0 ! characteristic ang. freq. of harmonic potential
    real(dp) :: omegaP = 1.d0 ! characteristic ang. freq. of PIMD springs
    real(dp) :: KBTO2 = 1.d0  ! kT/2
+   real(dp) :: MW02          ! m * omega0**2
+   real(dp) :: TDALP         ! 2.d0 * D * alpha
+   real(dp) :: FV0oX02       ! 4.d0 * V0 / x0**2
    real(dp) :: xc = 0.d0     ! centroid position
    real(dp) :: ONREP = 1.d0  ! 1/nrep
    ! energies
@@ -78,9 +89,9 @@ module param
    integer :: enerFileUnit = 13
    integer :: randfFileUnit = 14
 
-   namelist / thermostat / therm, gam, T, fmax, noiseGenMode, nQTB
-   namelist / potential / pot, f0
-   namelist / calculation / nstep, neq, nw, nrep, dt, x0, v0, m
+   namelist / thermostat / therm, gam, T, fmax, noiseGenMode, nQTB, piqtbMode
+   namelist / potential / pot, f0, A, V0, x0, D, alpha
+   namelist / calculation / nstep, neq, nw, nrep, dt, xini, vini, m
 
 contains
 

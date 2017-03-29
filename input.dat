@@ -1,26 +1,27 @@
-!*****************************************!
-!*  Necessary input file (input.dat) for *!
-!*           for simpleMD_1d             *!
-!*****************************************!
+!****************************************!
+!* Necessary input file (input.dat) for *!
+!*          for simpleMD_1d             *!
+!****************************************!
 
 &calculation
-nstep = 100000000
-nw = 500000
-dt = 0.25
+nstep = 2000000
+nw = 20000
+dt = 1.0
 m = 1836.15
+nrep = 4
 /
 
 ! calculation parameters
 ! parameter name (default value) : description
 !--------------------------------------------
-! nstep (1) : nb of MD steps for average values computation
-! neq (1)   : nb of MD steps for equilibration
-! nw (1)    : writing freq. in output files
-! nrep (1)  : number of replicas (Trotter nb - PIMD)
-! dt (1.0)  : timestep in fs
-! x0 (0.0)  : initial position in atomic units (bohr)
-! v0 (0.0)  : initial velocity in atomic units
-! m (1.0)   : mass of the particle in atomic units
+! nstep (1)  : nb of MD steps for average values computation
+! neq (1)    : nb of MD steps for equilibration
+! nw (1)     : writing freq. in output files
+! nrep (1)   : number of replicas (Trotter nb - PIMD)
+! dt (1.0)   : timestep in fs
+! xini (0.0) : initial position in atomic units (bohr)
+! vini (0.0) : initial velocity in atomic units
+! m (1.0)    : mass of the particle in atomic units
 
 &potential
 pot = 'harmonic'
@@ -35,11 +36,11 @@ f0 = 50.0
 
 &thermostat
 therm = 'qtb'
-gam = 0.5
+gam = 5
 fmax = 100.0
-noiseGenMode = 3
-nQTB = 200
-T = 50.0
+noiseGenMode = 1
+piqtbMode = 1
+T = 10.0
 /
 
 ! thermostat parameters
@@ -52,6 +53,9 @@ T = 50.0
 ! ( 1 : standard method of Dammak et al, 2 : modified method of Dammak et al
 !   3 : method of Barrat and Rodney )
 ! nQTB : nb of points (ie. grid) use for the discretization of the PSD (ie. filter)
-! or generation of QTB force using the method of Barrat (noiseGenMode = 3)
+! for generation of QTB forces using the method of Barrat (noiseGenMode = 3)
+! piqtbMode(0)     : type of piqtb (for fP function) 
+! (0 : all the normal modes are equivalent, 1 : the normal mode is in contact with a 
+! classical Langevin thermostat) 
 ! T (300.0)        : target temperature in K
 
