@@ -36,6 +36,7 @@ contains
    end function totalForce
 
    real(dp) function potentialForce(x)
+      ! compute the potential (external) force
       use param
       implicit none
 
@@ -71,7 +72,7 @@ contains
          case('nve')
             thermostatForce = 0.d0
          case('langevin')
-            thermostatForce = langevin(v)
+            thermostatForce = langevin(v, irep)
          case ('bussi')
             thermostatForce = 0.0d0
          case('qtb')

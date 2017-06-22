@@ -27,13 +27,13 @@ module param
    character(len = 10) :: therm = 'nve' ! type of thermostat
    real(dp) :: gam = 1.d0               ! friction coeff. in THz (1 THz)
    real(dp) :: T = 300.d0               ! temperature in K
-   real(dp) :: fmax = 1.0d7             ! max. freq. (cut-off) for QTB random
+   real(dp) :: fcut = 1.0d7             ! max. freq. (cut-off) for QTB random
                                         ! force generation in THz (1e8 THz!)
    integer :: noiseGenMode = 1          ! noise generation mode
    ! 1 : Random forces are generated using the method of Dammak et al.
    ! 2 : Random forces are generated using a modified version of the method
    ! of Dammak et al. where the random force is generated only for freq. btw
-   ! O and fmax and thus the random fore applies for more than one timestep.
+   ! O and fcut and thus the random fore applies for more than one timestep.
    ! 3 : Random forces are generated using the method of Barrat
    ! potential
    integer  :: nQTB = 100   ! nb of points/grid used for the PSD in freq. space
@@ -50,21 +50,26 @@ module param
                                            ! potential (in eV)
    real(dp) :: alpha = 1.d0                ! width of the Morse pot. (1/bohr)
    ! calculation
-   integer  :: nstep = 1     ! total number of MD steps (for average values)
-   integer  :: neq = 1       ! number of equilibrium steps
-   integer  :: nw = 1        ! writing frequency (in outputs files)
-   integer  :: nrep = 1      ! number of replicas (Trotter number) for PIMD
-   real(dp) :: dt = 1.d0     ! timestep (fs)
-   real(dp) :: xini = 0.d0   ! initial position (bohr)
-   real(dp) :: vini = 0.d0   ! initial velocity (bohr)
-   real(dp) :: m = 1.d0      ! mass of the particle (atomic units)
-   !other
+   integer  :: nstep = 1      ! total number of MD steps (for average values)
+   integer  :: neq = 1        ! number of equilibrium steps
+   integer  :: nw = 1         ! writing frequency (in outputs files)
+   integer  :: nrep = 1       ! number of replicas (Trotter number) for PIMD
+   real(dp) :: dt = 1.d0      ! timestep (fs)
+   real(dp) :: xini = 0.d0    ! initial position (bohr)
+   real(dp) :: vini = 0.d0    ! initial velocity (bohr)
+   real(dp) :: m = 1.d0       ! mass of the particle (atomic units)
+   logical  :: auto = .false. ! automatic computation of calculation parameters
+   real(dp) :: gamOfmin = 0.2d0 ! gamma / freq. min.
+   real(dp) :: dtOTmin = 0.02d0 ! dt / periode min.
+   real(dp) :: gamNdt = 3000.d0 ! gamma * Nmax * dt
+   real(dp) :: fcutOfmax = 2.d0 ! fcut / fmax
+
+   ! other
    integer  :: mQTB = 1      ! rand force generation/update every mQTB steps
    real(dp), dimension(:), allocatable   :: HQTB ! contains the "filter"(Barrat)
    real(dp), dimension(:,:), allocatable :: rQTB ! contains random nb (Barrat)
    real(dp) :: std = 0.d0    ! std deviation of Random force (Lang or QTB)
-   real(dp) :: R = 0.d0      ! stores random force (Langevin or QTB)
-   real(dp) :: omegamax = 1.d0 ! cut-off ang. freq. for QTB random forces
+   real(dp) :: omegacut = 1.d0 ! cut-off ang. freq. for QTB random forces
    real(dp) :: omega0 = 1.d0 ! characteristic ang. freq. of harmonic potential
    real(dp) :: omegaP = 1.d0 ! characteristic ang. freq. of PIMD springs
    real(dp) :: KBTO2 = 1.d0  ! kT/2
@@ -73,15 +78,29 @@ module param
    real(dp) :: FV0oX02       ! 4.d0 * V0 / x0**2
    real(dp) :: xc = 0.d0     ! centroid position
    real(dp) :: ONREP = 1.d0  ! 1/nrep
+   real(dp),dimension(:),allocatable :: R ! stores random forces (Langevin, QTB)
+   real(dp),dimension(:),allocatable :: Rk ! random forces on NM (QTB-PIMD)
+   real(dp),dimension(:,:),allocatable :: C ! Transformation matrix from NM
+   ! coordinates to direct coordinates for random forces
    ! energies
    real(dp) :: Ek = 0.0d0, EkPrim = 0.0d0, EkVir = 0.0d0, EkmVir = 0.0d0
+   real(dp) :: Ec = 0.0d0
    real(dp) :: Ek_av = 0.0d0, EkPrim_av = 0.0d0, EkVir_av = 0.0d0
-   real(dp) :: EkmVir_av = 0.0d0
+   real(dp) :: EkmVir_av = 0.0d0, Ec_av = 0.0d0
    ! instantaneous and average kinetic energy computed from different estimators
    ! Ek : "classical", EkPrim : Primitive, EkVir : (centroid) Virial
    ! EkmVir : modified (centroid) Virial. For more infos on these estimators
    ! see Brieuc, Dammak and Hayoun, JCTC, 12, 1351-1359 (2016)
    real(dp) :: Ep = 0.0d0, Ep_av = 0.0d0  ! inst. and av. potential energy
+
+   ! analysis
+   ! proba
+   logical  :: boolProba = .False.
+   real(dp) :: x0dens = 0.0d0 ! start of the interval for proba. dens.
+   real(dp) :: x1dens = 1.0d0 ! end of the interval for proba. dens.
+   real(dp) :: dxdens         ! dx for computation of proba (width of the bins)
+   integer  :: Ndens = 100    ! number of bins
+   real(dp), dimension(:), allocatable :: proba ! contains position proba. dens.
 
    ! for i/o
    integer :: posFileUnit  = 11
@@ -89,9 +108,11 @@ module param
    integer :: enerFileUnit = 13
    integer :: randfFileUnit = 14
 
-   namelist / thermostat / therm, gam, T, fmax, noiseGenMode, nQTB, piqtbMode
+   namelist / thermostat / therm, gam, T, fcut, noiseGenMode, nQTB, piqtbMode
    namelist / potential / pot, f0, A, V0, x0, D, alpha
-   namelist / calculation / nstep, neq, nw, nrep, dt, xini, vini, m
+   namelist / calculation / nstep, neq, nw, nrep, dt, xini, vini, m, auto,&
+                            gamOfmin, dtOTmin, gamNdt, fcutOfmax
+   namelist / analyse / boolProba, x0dens, x1dens, Ndens
 
 contains
 

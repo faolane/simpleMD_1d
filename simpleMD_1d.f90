@@ -22,6 +22,8 @@ include 'forces.f90'
 include 'energies.f90'
 ! contains subroutines & functions for (pseudo)random numbers generation
 include 'ZBQ.f90'
+! contains subroutines & functions for analysis of the MD trajectory
+include 'analysis.f90'
 
 program simpleMD_1d
    use param
@@ -29,6 +31,7 @@ program simpleMD_1d
    use force
    use energy
    use thermostats
+   use analysis
    implicit none
 
    character(len = 30) :: inputFile = 'input.dat'
@@ -37,8 +40,8 @@ program simpleMD_1d
    real(dp), dimension(:), allocatable    :: xx ! "new" position at time t+dt
    real(dp), dimension(:), allocatable    :: v  ! velocitiy at time t
    real(dp), dimension(:), allocatable    :: vv ! "new" velocity at time t+dt
-   real(dp) :: F                                ! force that apply on replica i
    real(dp) :: DT2OM, O2DT                      ! dt**2 / (2 * m), 1 / (2 * dt)
+   real(dp) :: F                                ! total force
 
    call readInputFile(inputFile)
    call printInfos('b')
@@ -105,6 +108,7 @@ program simpleMD_1d
       call computeInstEner(x(:,1), v)
       call computeAvEner()
       call printResults(istep, x(:,1))
+      call analyseMD(istep, x(:,1))
       xc = 0.d0
       do irep = 1 ,nrep
          ! Force

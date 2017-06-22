@@ -51,7 +51,7 @@ contains
       Ek = Ek_tmp
       if (trim(therm) == 'qtb') then
          EkPrim = Ek_tmp + EkPrim_tmp
-         EkVir = Ek_tmp * ONREP + EkVir_tmp
+         EkVir = KBTO2 + EkVir_tmp
          EkmVir = nrep * Ekin(vc) + EkVir_tmp
       else
          EkPrim = nrep * KBTO2 + EkPrim_tmp
@@ -59,6 +59,7 @@ contains
          EkmVir = nrep * Ekin(vc) + EkVir_tmp
       endif
       Ep = Ep_tmp
+      Ec = Ekin(vc)
 
    end subroutine computeInstEner
 
@@ -71,6 +72,7 @@ contains
       EkVir_av = EkVir_av + EkVir
       EkmVir_av = EkmVir_av + EkmVir
       Ep_av = Ep_av + Ep
+      Ec_av = Ec_av + Ec
 
    end subroutine computeAvEner
 

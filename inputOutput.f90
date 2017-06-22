@@ -19,6 +19,7 @@ contains
       ! read input parameters, initialize and converts it
       use param
       implicit none
+      real(dp) :: f, fmax, fmin
 
       character(len = 30), intent(in) :: fileName
 
@@ -31,8 +32,9 @@ contains
       V0 = eV2Ha(V0)
       read(10, thermostat)
       gam = THz2au(gam)
-      fmax = THz2au(fmax)
-      omegamax = TWOPI * fmax
+      fcut = THz2au(fcut)
+      omegacut = TWOPI * fcut
+      read(10, analyse)
       close(10)
 
       ! characteristic angular freq. of the PIMD springs btw replicas
@@ -42,12 +44,42 @@ contains
          omegaP = 0.d0
       endif
 
-      ! some usefull quantities
+      ! some useful quantities
       KBTO2 = 0.5d0 * KB * T
       ONREP = 1.d0 / dfloat(nrep)
       MW02 = m * omega0**2
       TDALP = 2.d0 * D * alpha
       FV0oX02 = 4.d0 * V0 / x0**2
+
+      ! characteristic angular freq.
+      select case (pot)
+         case('harmonic')
+            f = omega0 / TWOPI
+         case('quartic')
+            f = 0.0d0
+         case ('morse')
+            f = 0.0d0
+         case('double-well')
+            f = 0.0d0
+         case default
+            f = 0.0d0
+      end select
+      fmax = dsqrt(f**2 * ONREP + 4 * (omegaP/TWOPI)**2)
+      fmin = dsqrt(f**2 * ONREP)
+      print*, 'fmax, fmin', au2THz(fmax),au2THz(fmin)
+         !automatic computation of parameters
+      if (auto) then
+         gam = gamOfmin * fmin
+         dt = dtOTmin / fmax
+         nstep = nint(gamNdt / gam / dt)
+         fcut = fcutOfmax * fmax
+         omegacut = TWOPI * fcut
+      endif
+
+      if (fcut <= fmax) then
+         print*, '!!! fcut is small compared to fmax : fcut, fmax', &
+         au2THz(fcut), au2THz(fmax), 'THz'
+      endif
 
    end subroutine readInputFile
 
@@ -70,6 +102,8 @@ contains
             if (nrep > 1) then
                write(6, *) ''
                write(6, *) '# PIMD Simulation #'
+               if (auto) write(6, '(a49,i4)') ' automatic computation of dt,&
+               & gam, nstep and fcut'
                write(6, '(a28,i4)') ' number of replicas : nrep = ', nrep
                write(6, '(a16,e11.2,a3)') ' timestep : dt = ', au2fs(dt), ' fs'
                write(6, '(a42,i8)') ' number of equilibration MD steps : &
@@ -80,6 +114,8 @@ contains
             else
                write(6, *) ''
                write(6, *) '# MD Simulation #'
+               if (auto) write(6, '(a49,i4)') ' automatic computation of dt,&
+               & gam, nstep and fcut'
                write(6, '(a28,i4)') ' number of replicas : nrep = ', nrep
                write(6, '(a16,e11.2,a3)') ' timestep : dt = ', au2fs(dt), ' fs'
                write(6, '(a42,i8)') ' number of equilibration MD steps : &
@@ -96,8 +132,8 @@ contains
                   write(6, *) '# QTB thermostat #'
                   write(6, '(a29,e11.2,a4)') ' friction coefficient : gam = ', &
                                               &au2THz(gam), ' THz'
-                  write(6, '(a27,e11.2,a4)') ' cut-off frequency : fmax = ', &
-                                              &au2THz(fmax), ' THz'
+                  write(6, '(a27,e11.2,a4)') ' cut-off frequency : fcut = ', &
+                                              &au2THz(fcut), ' THz'
                case('bussi')
                   write(6, *) '# Bussi thermostat #'
                case('langevin')
@@ -119,6 +155,7 @@ contains
                case('quartic')
                   write(6, *) '# Quartic potential #'
                end select
+
          case('e')
             print*, ''
             call idate(date); call itime(time)
@@ -156,7 +193,7 @@ contains
                &kin. ener. (eV), av. prim. kin. ener. (eV), virial kin. ener. &
                &(eV), av. vir. kin. ener. (eV), modified vir. kin. ener. (eV), &
                &av. mod. vir. kin. ener. (eV), potential ener. (eV), av. pot. &
-               &ener. (eV)'
+               &ener. (eV), centroid kin. ener. (eV), av. cen. kin. ener. (eV)'
          else
             write(enerFileUnit, *) '# step nb, time (ps), kinetic &
                &energy (eV), average kin. ener. (eV), potential &
@@ -175,7 +212,8 @@ contains
                                   &Ha2eV(EkPrim), Ha2eV(EkPrim_av) / i, &
                                   &Ha2eV(EkVir), Ha2eV(EkVir_av) / i, &
                                   &Ha2eV(EkmVir), Ha2eV(EkmVir_av) / i, &
-                                  &Ha2eV(Ep), Ha2eV(Ep_av) / i
+                                  &Ha2eV(Ep), Ha2eV(Ep_av) / i, Ha2eV(Ec), &
+                                  &Ha2eV(Ec_av) / i
          else
             write(enerFileUnit, *) i, au2ps(i*dt), Ha2eV(Ek), Ha2eV(Ek_av) / i, &
                                   &Ha2eV(Ep), Ha2eV(Ep_av) / i
