@@ -20,3 +20,5 @@ compil
 *.pl
 #ignore temporary / test files
 fort.*
+#ignore python files
+*.py
