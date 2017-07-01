@@ -58,9 +58,9 @@ contains
          case('quartic')
             f = 0.0d0
          case ('morse')
-            f = 0.0d0
+            f = dsqrt(2.d0*D/m) * alpha/TWOPI
          case('double-well')
-            f = 0.0d0
+            f = dsqrt(8.d0*V0/m)/x0/TWOPI
          case default
             f = 0.0d0
       end select
@@ -69,11 +69,15 @@ contains
       print*, 'fmax, fmin', au2THz(fmax),au2THz(fmin)
          !automatic computation of parameters
       if (auto) then
-         gam = gamOfmin * fmin
-         dt = dtOTmin / fmax
-         nstep = nint(gamNdt / gam / dt)
-         fcut = fcutOfmax * fmax
-         omegacut = TWOPI * fcut
+         if (dabs(f) < 1.d-8) then
+            stop ('automatic computation of parmaeter is not possible')
+         else
+            gam = gamOfmin * fmin
+            dt = dtOTmin / fmax
+            nstep = nint(gamNdt / gam / dt)
+            fcut = fcutOfmax * fmax
+            omegacut = TWOPI * fcut
+         endif
       endif
 
       if (fcut <= fmax) then
@@ -199,6 +203,23 @@ contains
                &energy (eV), average kin. ener. (eV), potential &
                &ener. (eV), av. pot. ener. (eV)'
          endif
+         ! proba density file
+         if (boolProba) then
+            open(probaFileUnit, file='proba-density.res')
+            write(probaFileUnit,*) '# probability density of position (1/bohr)'
+            write(probaFileUnit,*) '# position x (bohr), replicas proba. density &
+            &(1/bohr), centroid proba. density (1/bohr)'
+         endif
+         ! radius of gyration file
+         if (boolRadGyr) then
+            open(radGyrFileUnit, file='radius-gyration.res')
+            write(radGyrFileUnit,*) '# step nb, time (ps), radius of gyration (bohr)'
+         endif
+      endif
+
+      if (i*100/nstep > cpt) then
+         print*, cpt, '%'
+         cpt = cpt+10
       endif
 
       if (mod(i, nw) == 0) then
@@ -218,13 +239,21 @@ contains
             write(enerFileUnit, *) i, au2ps(i*dt), Ha2eV(Ek), Ha2eV(Ek_av) / i, &
                                   &Ha2eV(Ep), Ha2eV(Ep_av) / i
          endif
+         ! print radius of gyration
+         if (boolRadGyr) then
+            write(radGyrFileUnit, *) i, au2ps(i*dt), radGyr / i
+         endif
       endif
 
       ! close files
       if (i == nstep) then
+         cpt = 100
+         print*, cpt, '%'
          close(posFileUnit)
          ! close(velFileUnit)
          close(enerFileUnit)
+         if (boolProba) close(probaFileUnit)
+         if (boolRadGyr) close(radGyrFileUnit)
       endif
 
    end subroutine printResults

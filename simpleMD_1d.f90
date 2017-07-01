@@ -80,8 +80,8 @@ program simpleMD_1d
    enddo
 
    ! equilibration MD loop
+   print*, 'Equilibration loop'
    do istep = 1, neq
-      call computeInstEner(x(:,1), v)
       xc = 0.d0
       do irep = 1 ,nrep
          ! forces
@@ -101,18 +101,15 @@ program simpleMD_1d
       enddo
    enddo
 
+   print*, 'Computation loop'
    ! initialize average energies to zero
    call initAvEner()
    ! averages computation MD loop
    do istep = 1, nstep
-      call computeInstEner(x(:,1), v)
-      call computeAvEner()
-      call printResults(istep, x(:,1))
-      call analyseMD(istep, x(:,1))
       xc = 0.d0
       do irep = 1 ,nrep
          ! Force
-         F = totalForce(x(irep,1), x(im(irep),1), x(ip(irep),1), v(irep), irep, istep)
+         F = totalForce(x(irep,1),x(im(irep),1),x(ip(irep),1),v(irep),irep,istep)
          ! Verlet - position - t+dt
          xx(irep) = 2.d0 * x(irep,1) - x(irep,2) + DT2OM * F
          ! centroid position
@@ -126,6 +123,10 @@ program simpleMD_1d
          x(irep,1) = xx(irep)
          v(irep) = vv(irep)
       enddo
+      call computeInstEner(x(:,1), v)
+      call computeAvEner()
+      call analyseMD(istep, x(:,1))
+      call printResults(istep, x(:,1))
    enddo
 
    deallocate(x)

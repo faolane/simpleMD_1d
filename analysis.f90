@@ -28,6 +28,7 @@ contains
       endif
 
       if(boolProba) call computeProbaDens(x,1)
+      if(boolRadGyr) call computeRadiusofGyration(x)
 
       if (istep == nstep) then
          if (boolProba) call computeProbaDens(x,2)
@@ -46,29 +47,48 @@ contains
 
       if (mode == 0) then
          allocate(proba(0:Ndens))
+         allocate(probaCen(0:Ndens))
          proba = 0.d0
+         probaCen = 0.d0
          dxdens = (x1dens - x0dens) / Ndens
-         print*, 'dx', dxdens
       else if (mode == 1) then
          do i = 1, nrep
             k = nint((x(i) - x0dens) / dxdens)
-            if (i >=0 .and. i<=Ndens) proba(k) = proba(k) + 1
+            if (k >= 0 .and. k <= Ndens) proba(k) = proba(k) + 1
          enddo
+         k = nint((xc - x0dens) / dxdens)
+         if (k >= 0 .and. k <= Ndens) probaCen(k) = probaCen(k) + 1
       else if (mode == 2) then
          ! normalization
          norm = sum(proba) * dxdens
-         print*, 'norm', norm
          proba = proba / norm
-         open(200, file='proba-density.res')
-         write(200,*) '# probability density of position (1/bohr)'
-         write(200,*) '# position x (bohr), proba density (1/bohr)'
+         norm = sum(probaCen) * dxdens
+         probaCen = probaCen / norm
          do i = 0, Ndens
-            write(200,*) x0dens + i * dxdens, proba(i)
+            write(probaFileUnit,*) x0dens + i * dxdens, proba(i), probaCen(i)
          enddo
-         close(200)
          deallocate(proba)
+         deallocate(probaCen)
       endif
 
    end subroutine computeProbaDens
+
+   subroutine computeRadiusofGyration(x)
+      ! compute the radius of gyration
+      use param
+      implicit none
+
+      real(dp), dimension(nrep), intent(in) :: x  !position
+      real(dp) :: tmp
+      integer :: i
+
+      tmp = 0.d0
+      do i = 1, nrep
+         tmp = tmp + (x(i) - xc)**2
+      enddo
+      tmp = tmp*ONREP
+      radGyr = radGyr + dsqrt(tmp)
+
+   end subroutine computeRadiusofGyration
 
 end module analysis

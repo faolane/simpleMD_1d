@@ -28,7 +28,7 @@ module param
    real(dp) :: gam = 1.d0               ! friction coeff. in THz (1 THz)
    real(dp) :: T = 300.d0               ! temperature in K
    real(dp) :: fcut = 1.0d7             ! max. freq. (cut-off) for QTB random
-                                        ! force generation in THz (1e8 THz!)
+                                        ! force generation in THz (1e7 THz!)
    integer :: noiseGenMode = 1          ! noise generation mode
    ! 1 : Random forces are generated using the method of Dammak et al.
    ! 2 : Random forces are generated using a modified version of the method
@@ -65,6 +65,7 @@ module param
    real(dp) :: fcutOfmax = 2.d0 ! fcut / fmax
 
    ! other
+   integer  :: cpt = 10      ! to follow the trajectory advancement
    integer  :: mQTB = 1      ! rand force generation/update every mQTB steps
    real(dp), dimension(:), allocatable   :: HQTB ! contains the "filter"(Barrat)
    real(dp), dimension(:,:), allocatable :: rQTB ! contains random nb (Barrat)
@@ -100,19 +101,25 @@ module param
    real(dp) :: x1dens = 1.0d0 ! end of the interval for proba. dens.
    real(dp) :: dxdens         ! dx for computation of proba (width of the bins)
    integer  :: Ndens = 100    ! number of bins
-   real(dp), dimension(:), allocatable :: proba ! contains position proba. dens.
+   real(dp), dimension(:), allocatable :: proba ! replicas proba. density
+   real(dp), dimension(:), allocatable :: probaCen ! centroid proba. density
+   ! radius of gyration
+   logical  :: boolRadGyr = .False.
+   real(dp) :: radGyr = 0.d0 ! radius of gyration
 
    ! for i/o
    integer :: posFileUnit  = 11
    integer :: velFileUnit  = 12
    integer :: enerFileUnit = 13
    integer :: randfFileUnit = 14
+   integer :: probaFileUnit = 15
+   integer :: radGyrFileUnit = 16
 
    namelist / thermostat / therm, gam, T, fcut, noiseGenMode, nQTB, piqtbMode
    namelist / potential / pot, f0, A, V0, x0, D, alpha
    namelist / calculation / nstep, neq, nw, nrep, dt, xini, vini, m, auto,&
                             gamOfmin, dtOTmin, gamNdt, fcutOfmax
-   namelist / analyse / boolProba, x0dens, x1dens, Ndens
+   namelist / analyse / boolProba, x0dens, x1dens, Ndens, boolRadGyr
 
 contains
 

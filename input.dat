@@ -4,12 +4,12 @@
 !****************************************!
 
 &calculation
-nstep = 40000000
+nstep = 80000000
 nw = 2000
 dt = 0.1
 m = 1836.15
-nrep = 1
-auto = .true.
+nrep = 64
+auto = .True.
 gamNdt = 8000.d0
 gamOfmin = 0.2d0
 dtOTmin = 0.01d0 
@@ -31,6 +31,8 @@ fcutOfmax = 1.25d0
 &potential
 pot = 'harmonic'
 f0 = 50.0
+D = 0.8
+alpha = 0.3
 /
 
 ! potential parameters
@@ -43,9 +45,9 @@ f0 = 50.0
 therm = 'qtb'
 gam = 1.0
 fcut = 100.0
-noiseGenMode = 1
+noiseGenMode = 3
 nQTB = 200
-piqtbMode = 0
+piqtbMode = 1
 T = 300.0
 /
 
@@ -67,9 +69,10 @@ T = 300.0
 
 &analyse
 boolProba = .True.
-x0dens = -1.2d0
-x1dens = 1.2d0
+x0dens = -2.0d0
+x1dens = 2.0d0
 Ndens = 200
+boolRadGyr = .True.
 /
 
 ! analysis parameters
