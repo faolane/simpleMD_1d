@@ -7,7 +7,7 @@ FLIBS = -L/usr/local/lib -lfftw3
 EXE = simpleMD_1d.exe
 #OBJ = simpleMD_1d.o parameters.o thermostats.o inputOutput.o forces.o /
 #energies.o ZBQ.fo
-OBJ = simpleMD_1d.f90 parameters.f90 thermostats.f90 inputOutput.f90 forces.f90 energies.f90 ZBQ.f90
+OBJ = simpleMD_1d.f90 parameters.f90 thermostats.f90 inputOutput.f90 forces.f90 energies.f90 ZBQ.f90 analysis.f90
 
 $(EXE): $(OBJ)
 	$(FC) simpleMD_1d.f90 -o $(EXE) $(FFLAGS) $(FLIBS)
