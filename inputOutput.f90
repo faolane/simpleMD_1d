@@ -217,7 +217,7 @@ contains
          endif
       endif
 
-      if (i*100/nstep > cpt) then
+      if (nint(dfloat(i)/dfloat(nstep)*100.d0) == cpt) then
          print*, cpt, '%'
          cpt = cpt+10
       endif
@@ -247,8 +247,6 @@ contains
 
       ! close files
       if (i == nstep) then
-         cpt = 100
-         print*, cpt, '%'
          close(posFileUnit)
          ! close(velFileUnit)
          close(enerFileUnit)

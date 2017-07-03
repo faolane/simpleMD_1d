@@ -645,7 +645,7 @@ contains
          ! **** tests ****
          open(100,file='fP_function.res')
          ! "average error"
-         if (err > 1.d-5) then
+         if (err > 1.d-4) then
             print*, 'probable error during the generation of F_P function :'
             print*, 'average "error"', err
          endif
@@ -832,7 +832,7 @@ contains
          ! **** tests ****
          open(100,file='fP_function.res')
          ! "average error"
-         if (err > 1.d-5) then
+         if (err > 1.d-4) then
             print*, 'probable error during the generation of F_P function :'
             print*, 'average "error"', err
          endif
