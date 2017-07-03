@@ -22,3 +22,5 @@ compil
 fort.*
 #ignore python files
 *.py
+#ignore outut files
+*.out
