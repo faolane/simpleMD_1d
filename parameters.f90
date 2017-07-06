@@ -36,8 +36,8 @@ module param
    ! O and fcut and thus the random fore applies for more than one timestep.
    ! 3 : Random forces are generated using the method of Barrat
    ! potential
-   integer  :: nQTB = 100   ! nb of points/grid used for the PSD in freq. space
-         ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)
+   integer  :: nQTB = 250   ! nb of points/grid used for the PSD in freq. space
+         ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)\
    integer  :: piqtbMode = 0               ! QTB-PIMD mode (0)
    character(len = 15) :: pot = 'harmonic' ! type of external potential
    real(dp) :: f0 = 10.d0                  ! characteristic frequency of

@@ -4,14 +4,14 @@
 !****************************************!
 
 &calculation
-nstep = 80000000
+nstep = 20000000
 nw = 2000
-dt = 0.1
+dt = 0.4
 m = 1836.15
-nrep = 1
-auto = .True.
-gamNdt = 80000.d0
-gamOfmin = 0.5d0
+nrep = 32
+auto = .true.
+gamNdt = 10000.d0
+gamOfmin = 0.1d0
 dtOTmin = 0.01d0 
 fcutOfmax = 2.0d0
 /
@@ -29,7 +29,7 @@ fcutOfmax = 2.0d0
 ! m (1.0)    : mass of the particle in atomic units
 
 &potential
-pot = 'morse'
+pot = 'harmonic'
 f0 = 50.0
 D = 0.8
 alpha = 0.3
@@ -43,12 +43,12 @@ alpha = 0.3
 
 &thermostat
 therm = 'qtb'
-gam = 1.0
+gam = 5.0
 fcut = 100.0
 noiseGenMode = 3
-nQTB = 200
+nQTB = 500
 piqtbMode = 0
-T = 100.0
+T = 300.0
 /
 
 ! thermostat parameters
@@ -69,8 +69,8 @@ T = 100.0
 
 &analyse
 boolProba = .True.
-x0dens = -2.5d0
-x1dens = 3.0d0
+x0dens = -2.0d0
+x1dens = 2.0d0
 Ndens = 200
 boolRadGyr = .True.
 /

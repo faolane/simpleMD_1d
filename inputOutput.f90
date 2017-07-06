@@ -19,7 +19,7 @@ contains
       ! read input parameters, initialize and converts it
       use param
       implicit none
-      real(dp) :: f, fmax, fmin
+      real(dp) :: f, fmax, fmin, tmp
 
       character(len = 30), intent(in) :: fileName
 
@@ -67,16 +67,27 @@ contains
       fmax = dsqrt(f**2 * ONREP + 4 * (omegaP/TWOPI)**2)
       fmin = dsqrt(f**2 * ONREP)
       print*, 'fmax, fmin', au2THz(fmax),au2THz(fmin)
-         !automatic computation of parameters
+      !automatic computation of parameters
       if (auto) then
          if (dabs(f) < 1.d-8) then
-            stop ('automatic computation of parmaeter is not possible')
+            stop ('automatic computation of parameters is not possible')
          else
             gam = gamOfmin * fmin
             dt = dtOTmin / fmax
             nstep = nint(gamNdt / gam / dt)
             fcut = fcutOfmax * fmax
             omegacut = TWOPI * fcut
+         endif
+         if (nrep > 1) then
+           ! delta omega max btw NM angular freq.
+           tmp = 2.d0*omegaP*(1.d0-dsin((0.5d0-ONREP)*PI))
+           nQTB = nint(2*fcut*TWOPI/tmp)
+           print*, 'nQTB=', nQTB
+           ! print*, 'delta omega max =', au2THz(tmp), 'rad/ps', au2THz(tmp/TWOPI), 'THz'
+           ! print*, 'nmax =', 2.d0*PI/(tmp*h)
+           ! print*, 'omega_P/2=', au2THz(2.d0*omegaP)
+           ! print*, 'omega_P/2-1=', au2THz(2.d0*omegaP*dsin((0.5d0*nrep-1)*PI*ONREP))
+           ! print*, 'delta omega max=', au2THz(2.d0*omegaP*(1.d0-dsin((0.5d0*nrep-1)*PI*ONREP)))
          endif
       endif
 
@@ -94,6 +105,7 @@ contains
 
       character, intent(in) :: mode
       integer, dimension(3) :: date, time ! store date and time
+      real(dp) :: f
 
       select case (mode)
          case('b')
@@ -148,14 +160,21 @@ contains
             write(6, *) ''
             select case (pot)
                case('harmonic')
+                  f = omega0 / TWOPI
                   write(6, *) '# Harmonic potential #'
                   write(6, '(a28,f7.2,a4)') ' characteristic frequency : ', &
-                                             &au2THz(omega0 / TWOPI), ' THz'
+                                                            &au2THz(f), ' THz'
 
                case('morse')
+                  f = dsqrt(2.d0*D/m) * alpha/TWOPI
                   write(6, *) '# Morse potential #'
+                  write(6, '(a42,f7.2,a4)') ' "harmonique" characteristic &
+                                           & frequency : ', au2THz(f), ' THz'
                case('double-well')
+                  f = dsqrt(8.d0*V0/m)/x0/TWOPI
                   write(6, *) '# Double-well potential #'
+                  write(6, '(a42,f7.2,a4)') ' "harmonique" characteristic &
+                                           & frequency : ', au2THz(f), ' THz'
                case('quartic')
                   write(6, *) '# Quartic potential #'
                end select
@@ -163,7 +182,7 @@ contains
          case('e')
             print*, ''
             call idate(date); call itime(time)
-            write(6,'(a35,i2.2,a1,i2.2,a1,i4,a4,i2.2,a,i2.2,a,i2.2)'), &
+            write(6,'(a35,i2.2,a1,i2.2,a1,i4,a4,i2.2,a,i2.2,a,i2.2)') &
                      &' calculation correctly finished on ', &
                      & date(1), '\',  date(2), '\', date(3), &
                      &' at ', time(1), ':', time(2), ':', time(3)
