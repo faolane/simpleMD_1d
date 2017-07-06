@@ -78,10 +78,10 @@ contains
             fcut = fcutOfmax * fmax
             omegacut = TWOPI * fcut
          endif
-         if (nrep > 1) then
+         if (nrep > 1 .and. noiseGenMode == 3) then
            ! delta omega max btw NM angular freq.
            tmp = 2.d0*omegaP*(1.d0-dsin((0.5d0-ONREP)*PI))
-           nQTB = nint(2*fcut*TWOPI/tmp)
+           nQTB = nint(2*fcut*TWOPI/tmp)/2
            print*, 'nQTB=', nQTB
            ! print*, 'delta omega max =', au2THz(tmp), 'rad/ps', au2THz(tmp/TWOPI), 'THz'
            ! print*, 'nmax =', 2.d0*PI/(tmp*h)

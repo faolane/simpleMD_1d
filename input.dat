@@ -8,10 +8,10 @@ nstep = 20000000
 nw = 2000
 dt = 0.4
 m = 1836.15
-nrep = 32
+nrep = 64
 auto = .true.
-gamNdt = 10000.d0
-gamOfmin = 0.1d0
+gamNdt = 2500.d0
+gamOfmin = 0.2d0
 dtOTmin = 0.01d0 
 fcutOfmax = 2.0d0
 /
