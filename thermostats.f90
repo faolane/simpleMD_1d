@@ -494,14 +494,17 @@ contains
          tmp = 0.5d0 * w * h
          correct = dsin(tmp) / tmp
          Hw(iw) = dsqrt(fP(-iiw)) / correct
+         ! write(200,*) iw, au2THz(iw*dw/TWOPI), Hw(iw)
       enddo
       Hw(nmax/2) = 0.d0
+      ! write(200,*) nmax/2, au2THz(nmax/2*dw/TWOPI), Hw(nmax/2)
       do iw = nmax/2 + 1, nmax - 1
          iiw = iw - nmax / 2
          w = iiw * dw
          tmp = 0.5d0 * w * h
          correct = dsin(tmp) / tmp
          Hw(iw) = dsqrt(fP(iiw)) / correct
+         ! write(200,*) iw, au2THz(iw*dw/TWOPI), Hw(iw)
       enddo
 
       ! compute the "filter" in time space H(t)

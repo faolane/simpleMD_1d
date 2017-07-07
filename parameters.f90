@@ -37,7 +37,7 @@ module param
    ! 3 : Random forces are generated using the method of Barrat
    ! potential
    integer  :: nQTB = 250   ! nb of points/grid used for the PSD in freq. space
-         ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)\
+         ! for QTB randf generation with the method of Barrat (noiseGenMode = 3)
    integer  :: piqtbMode = 0               ! QTB-PIMD mode (0)
    character(len = 15) :: pot = 'harmonic' ! type of external potential
    real(dp) :: f0 = 10.d0                  ! characteristic frequency of
@@ -61,8 +61,10 @@ module param
    logical  :: auto = .false. ! automatic computation of calculation parameters
    real(dp) :: gamOfmin = 0.2d0 ! gamma / freq. min.
    real(dp) :: dtOTmin = 0.02d0 ! dt / periode min.
-   real(dp) :: gamNdt = 3000.d0 ! gamma * Nmax * dt
+   real(dp) :: gamNdt = 4000.d0 ! gamma * Nmax * dt
    real(dp) :: fcutOfmax = 2.d0 ! fcut / fmax
+   real(dp) :: QTBfreqStep = 0.5d0 ! freq step used for generation of H(w) and
+                                   ! H(t) in QTB - noiseGenMode = 3 (THz)
 
    ! other
    integer  :: cpt = 10      ! to follow the trajectory advancement
@@ -118,7 +120,7 @@ module param
    namelist / thermostat / therm, gam, T, fcut, noiseGenMode, nQTB, piqtbMode
    namelist / potential / pot, f0, A, V0, x0, D, alpha
    namelist / calculation / nstep, neq, nw, nrep, dt, xini, vini, m, auto,&
-                            gamOfmin, dtOTmin, gamNdt, fcutOfmax
+                            gamOfmin, dtOTmin, gamNdt, fcutOfmax, QTBfreqStep
    namelist / analyse / boolProba, x0dens, x1dens, Ndens, boolRadGyr
 
 contains

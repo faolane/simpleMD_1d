@@ -9,24 +9,28 @@ nw = 2000
 dt = 0.4
 m = 1836.15
 nrep = 64
-auto = .true.
-gamNdt = 2500.d0
+auto = .True.
+gamNdt = 2000.d0
 gamOfmin = 0.2d0
 dtOTmin = 0.01d0 
 fcutOfmax = 2.0d0
+QTBfreqStep = 0.5d0
 /
 
 ! calculation parameters
 ! parameter name (default value) : description
 !--------------------------------------------
-! nstep (1)  : nb of MD steps for average values computation
-! neq (1)    : nb of MD steps for equilibration
-! nw (1)     : writing freq. in output files
-! nrep (1)   : number of replicas (Trotter nb - PIMD)
-! dt (1.0)   : timestep in fs
-! xini (0.0) : initial position in atomic units (bohr)
-! vini (0.0) : initial velocity in atomic units
-! m (1.0)    : mass of the particle in atomic units
+! nstep (1)   : nb of MD steps for average values computation
+! neq (1)     : nb of MD steps for equilibration
+! nw (1)      : writing freq. in output files
+! nrep (1)    : number of replicas (Trotter nb - PIMD)
+! dt (1.0)    : timestep in fs
+! xini (0.0)  : initial position in atomic units (bohr)
+! vini (0.0)  : initial velocity in atomic units
+! m (1.0)     : mass of the particle in atomic units
+! auto (false): if set to .true. then gam, fcut, dt, nstep and nQTB 
+!               are chosen automatically according to the value of
+!               gamNdt, gamOfmin, dtOTmin, fcutOfmax and QTBfreqStep
 
 &potential
 pot = 'harmonic'
@@ -40,6 +44,8 @@ alpha = 0.3
 !--------------------------------------------
 ! pot ('harmonic') : type of potential well ('harmonic', 'morse', 'quartic', 'double-well')
 ! f0 (10.0)        : characteristic freq. of the harmonic potential in THz
+! D (1.0)          : dissociation energy of the Morse potential in eV
+! alpha (1.0)      : 1 / characteristic width of the Morse potential in 1/bohr
 
 &thermostat
 therm = 'qtb'
@@ -47,7 +53,7 @@ gam = 5.0
 fcut = 100.0
 noiseGenMode = 3
 nQTB = 500
-piqtbMode = 0
+piqtbMode = 1
 T = 300.0
 /
 

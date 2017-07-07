@@ -19,7 +19,7 @@ contains
       ! read input parameters, initialize and converts it
       use param
       implicit none
-      real(dp) :: f, fmax, fmin, tmp
+      real(dp) :: f, fmax, fmin
 
       character(len = 30), intent(in) :: fileName
 
@@ -80,8 +80,9 @@ contains
          endif
          if (nrep > 1 .and. noiseGenMode == 3) then
            ! delta omega max btw NM angular freq.
-           tmp = 2.d0*omegaP*(1.d0-dsin((0.5d0-ONREP)*PI))
-           nQTB = nint(2*fcut*TWOPI/tmp)/2
+           ! tmp = 2.d0*omegaP*(1.d0-dsin((0.5d0-ONREP)*PI))
+           ! nQTB = nint(2*fcut*TWOPI/tmp)/2
+           nQTB = nint(2*fcut/THz2au(QTBfreqStep))
            print*, 'nQTB=', nQTB
            ! print*, 'delta omega max =', au2THz(tmp), 'rad/ps', au2THz(tmp/TWOPI), 'THz'
            ! print*, 'nmax =', 2.d0*PI/(tmp*h)
