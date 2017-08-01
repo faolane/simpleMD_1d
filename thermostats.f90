@@ -231,7 +231,7 @@ contains
       else if (piqtbMode == 1) then
          call computefP1(fP, dw)
       else
-         stop ('Error : wrong value of piqtbMode (= 0 or 1)')
+         stop 'Error : wrong value of piqtbMode (= 0 or 1)'
       endif
       fP = dfloat(nrep) * KB * T * fP ! fP is now in energy units
 
@@ -357,7 +357,7 @@ contains
       else if (piqtbMode == 1) then
          call computefP1(fP, dw)
       else
-         stop ('Error : wrong value of piqtbMode (= 0 or 1)')
+         stop 'Error : wrong value of piqtbMode (= 0 or 1)'
       endif
       fP = dfloat(nrep) * KB * T * fP !fP is now in energy units
 
@@ -483,7 +483,7 @@ contains
       else if (piqtbMode == 1) then
          call computefP1(fP, dw)
       else
-         stop ('Error : wrong value of piqtbMode (= 0 or 1)')
+         stop 'Error : wrong value of piqtbMode (= 0 or 1)'
       endif
       fP = dfloat(nrep) * KB * T * fP !fP is now in energy units
 
@@ -684,7 +684,7 @@ contains
             if (k > nx) then
                fP(j) = aa * x1 + bb
             else if (k <= 0) then
-               stop ('error in fP computation x < xmin')
+               stop 'error in fP computation x < xmin'
             else
                if (x1 > x(k)) then
                   fP(j) = fP1(k) + (fP1(k+1)-fP1(k))/dx * (x1-x(k))
@@ -765,7 +765,7 @@ contains
          print*, 'dw=', dw
          print*, 'dx=', dx
          print*, 'xmax=', xmax
-         print*, 'nx, n, mu=', nx, n
+         print*, 'nx, n=', nx, n
 
          ! allocation
          allocate(x(nx))
@@ -916,7 +916,7 @@ contains
 
       n = size(x_in)
       ntest = size(x_out)
-      if (n /= ntest) stop ('Error with FFT during QTB random force generation')
+      if (n /= ntest) stop 'Error with FFT during QTB random force generation'
 
       if (trim(mode) == 'init') then
          call dfftw_plan_dft_1d(plan,n,x_in,x_out,'FFTW_FORWARD','FTTW_ESTIMATE')
@@ -961,7 +961,7 @@ contains
 
       n = size(y)
       if(size(x) /= n) then
-         stop ('error in linReg subroutine: x and y don''t have the same size')
+         stop 'error in linReg subroutine: x and y don''t have the same size'
       endif
 
       xav = 0.d0

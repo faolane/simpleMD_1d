@@ -169,12 +169,12 @@ contains
                case('morse')
                   f = dsqrt(2.d0*D/m) * alpha/TWOPI
                   write(6, *) '# Morse potential #'
-                  write(6, '(a42,f7.2,a4)') ' "harmonique" characteristic &
+                  write(6, '(a42,f7.2,a4)') ' "harmonic" characteristic &
                                            & frequency : ', au2THz(f), ' THz'
                case('double-well')
                   f = dsqrt(8.d0*V0/m)/x0/TWOPI
                   write(6, *) '# Double-well potential #'
-                  write(6, '(a42,f7.2,a4)') ' "harmonique" characteristic &
+                  write(6, '(a42,f7.2,a4)') ' "harmonic" characteristic &
                                            & frequency : ', au2THz(f), ' THz'
                case('quartic')
                   write(6, *) '# Quartic potential #'
