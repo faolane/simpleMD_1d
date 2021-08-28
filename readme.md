@@ -9,7 +9,7 @@ The code is still in beta for now so most features have not been fully tested ye
 
 ## Quick starting guide:
 
-* Type `make` to compil the program
+* Type `make` to compile the program
 
 * Edit the 'input.dat' file to your need (see documentation)
 
@@ -17,6 +17,6 @@ The code is still in beta for now so most features have not been fully tested ye
 
 ## Copyright
 
-Copyright (C) 2017 Fabien Brieuc.
+Copyright (C) Fabien Brieuc.
 This software is distributed under the terms of the GNU General Public License.
 See the file license.txt for a copy of the license or get it at the following address: http://www.gnu.org/copyleft/gpl.txt
